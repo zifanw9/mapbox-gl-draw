@@ -75,8 +75,8 @@ DirectSelect.pathsToCoordinates = function(featureId, paths) {
 };
 
 DirectSelect.onFeature = function(state, e) {
-  if (state.selectedCoordPaths.length === 0) this.startDragging(state, e);
-  else this.stopDragging(state);
+  // Whole-feature drag disabled: do not start drag when clicking on polygon body
+  this.stopDragging(state);
 };
 
 DirectSelect.dragFeature = function(state, e, delta) {
@@ -194,7 +194,8 @@ DirectSelect.onMouseMove = function(state, e) {
   const onVertex = isVertex(e);
   const isMidPoint = isMidpoint(e);
   const noCoords = state.selectedCoordPaths.length === 0;
-  if (isFeature && noCoords) this.updateUIClasses({ mouse: Constants.cursors.MOVE });
+  // Whole-feature drag disabled: use pointer over polygon body, move only over vertices
+  if (isFeature && noCoords) this.updateUIClasses({ mouse: Constants.cursors.POINTER });
   else if (onVertex && !noCoords) this.updateUIClasses({ mouse: Constants.cursors.MOVE });
   else this.updateUIClasses({ mouse: Constants.cursors.NONE });
 
@@ -230,10 +231,11 @@ DirectSelect.onDrag = function(state, e) {
     lng: e.lngLat.lng - state.dragMoveLocation.lng,
     lat: e.lngLat.lat - state.dragMoveLocation.lat
   };
-  if (state.selectedCoordPaths.length > 0) this.dragVertex(state, e, delta);
-  else this.dragFeature(state, e, delta);
-
-  state.dragMoveLocation = e.lngLat;
+  // Only allow vertex drag; whole-feature drag is disabled
+  if (state.selectedCoordPaths.length > 0) {
+    this.dragVertex(state, e, delta);
+    state.dragMoveLocation = e.lngLat;
+  }
 };
 
 DirectSelect.onClick = function(state, e) {

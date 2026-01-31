@@ -155,15 +155,9 @@ SimpleSelect.startOnActiveFeature = function(state, e) {
   // Stop any already-underway extended interactions
   this.stopExtendedInteractions(state);
 
-  // Disable map.dragPan immediately so it can't start
-  this.map.dragPan.disable();
-
-  // Re-render it and enable drag move
+  // Re-render the feature (selection feedback only).
+  // Dragging of features is disabled: do not set canDragMove or disable map pan.
   this.doRender(e.featureTarget.properties.id);
-
-  // Set up the state for drag moving
-  state.canDragMove = true;
-  state.dragMoveLocation = e.lngLat;
 };
 
 SimpleSelect.clickOnFeature = function(state, e) {
@@ -196,13 +190,13 @@ SimpleSelect.clickOnFeature = function(state, e) {
   } else if (!isFeatureSelected && isShiftClick) {
     // Add it to the selection
     this.select(featureId);
-    this.updateUIClasses({ mouse: Constants.cursors.MOVE });
+    this.updateUIClasses({ mouse: Constants.cursors.POINTER });
   // Click (without shift) on an unselected feature
   } else if (!isFeatureSelected && !isShiftClick) {
     // Make it the only selected feature
     selectedFeatureIds.forEach(id => this.doRender(id));
     this.setSelected(featureId);
-    this.updateUIClasses({ mouse: Constants.cursors.MOVE });
+    this.updateUIClasses({ mouse: Constants.cursors.POINTER });
   }
 
   // No matter what, re-render the clicked feature
@@ -287,7 +281,7 @@ SimpleSelect.onTouchEnd = SimpleSelect.onMouseUp = function(state, e) {
     if (idsToSelect.length) {
       this.select(idsToSelect);
       idsToSelect.forEach(id => this.doRender(id));
-      this.updateUIClasses({ mouse: Constants.cursors.MOVE });
+      this.updateUIClasses({ mouse: Constants.cursors.POINTER });
     }
   }
   this.stopExtendedInteractions(state);
