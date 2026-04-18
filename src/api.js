@@ -196,5 +196,23 @@ export default function(ctx, api) {
     return api;
   };
 
+  /**
+   * Allow touch taps to synthesize map `click` events (fixes mobile when Draw is on the map).
+   * @see https://github.com/mapbox/mapbox-gl-draw/issues/1301
+   */
+  api.enableMapClicks = function() {
+    ctx._mapClicksEnabled = true;
+    return api;
+  };
+
+  /**
+   * Restore legacy behavior: tap touchend calls preventDefault (no synthesized click).
+   * Use during draw_* modes if you see duplicate map clicks after a tap.
+   */
+  api.disableMapClicks = function() {
+    ctx._mapClicksEnabled = false;
+    return api;
+  };
+
   return api;
 }

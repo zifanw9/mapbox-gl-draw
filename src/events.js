@@ -102,9 +102,6 @@ export default function(ctx) {
   };
 
   events.touchend = function(event) {
-    // Prevent emulated mouse events because we will fully handle the touch here.
-    // This does not stop the touch events from propogating to mapbox though.
-    event.originalEvent.preventDefault();
     if (!ctx.options.touchEnabled) {
       return;
     }
@@ -115,8 +112,15 @@ export default function(ctx) {
       time: new Date().getTime(),
       point: event.point
     })) {
+      // Unconditional preventDefault here blocks the browser from synthesizing click on mobile (#1301).
+      // When _mapClicksEnabled is true (default), allow clicks to reach the map / layer handlers.
+      if (!ctx._mapClicksEnabled) {
+        event.originalEvent.preventDefault();
+      }
       currentMode.tap(event);
     } else {
+      // Drag ended: suppress the synthetic click that would follow a pan-like gesture.
+      event.originalEvent.preventDefault();
       currentMode.touchend(event);
     }
   };

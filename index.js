@@ -9,7 +9,9 @@ const setupDraw = function(options, api) {
   options = setupOptions(options);
 
   const ctx = {
-    options
+    options,
+    /** When true, tap `touchend` does not call preventDefault so the map can receive synthesized clicks (mobile). See github.com/mapbox/mapbox-gl-draw/issues/1301 */
+    _mapClicksEnabled: true
   };
 
   api = setupAPI(ctx, api);
